@@ -1,8 +1,8 @@
 
-import RagSystem from "@/components/RagSystem";
+import Rag from "./Rag";
 
 const Index = () => {
-  return <RagSystem />;
+  return <Rag />;
 };
 
 export default Index;
