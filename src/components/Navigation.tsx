@@ -19,6 +19,16 @@ const Navigation = () => {
                   : "border-transparent text-rag-600 hover:text-rag-900 hover:border-rag-300"
               }`}
             >
+              Home
+            </Link>
+            <Link
+              to="/rag"
+              className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
+                isActive("/rag")
+                  ? "border-rag-900 text-rag-900"
+                  : "border-transparent text-rag-600 hover:text-rag-900 hover:border-rag-300"
+              }`}
+            >
               RAG
             </Link>
             <Link
