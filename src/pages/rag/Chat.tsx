@@ -67,7 +67,7 @@ const Chat = () => {
 
   const fetchNiches = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/get-niches");
+      const response = await fetch("https://ushapangeni.com.np/get-niches"); // Changed to use the Cloudflare Tunnel URL
       const data = await response.json();
 
       if (data.success) {
@@ -123,7 +123,7 @@ const Chat = () => {
     setQuestion("");
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/query", {
+      const response = await fetch("https://ushapangeni.com.np/query", { // Changed to use the Cloudflare Tunnel URL
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -37,7 +37,7 @@ const BrowserUse: React.FC = () => {
     setIsProcessing(true);
     setResults([]);
 
-    fetch("http://localhost:5000/browse/run_tasks", {
+    fetch("https://ushapangeni.com.np/browse/run_tasks", { // Changed to use the Cloudflare Tunnel URL
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ tasks: cleanedTasks }),
@@ -45,7 +45,7 @@ const BrowserUse: React.FC = () => {
     .then(response => response.json())
     .then(data => {
         if (data.status === "success") {
-          const newEventSource = new EventSource("http://localhost:5000/browse/stream_updates");
+          const newEventSource = new EventSource("https://ushapangeni.com.np/browse/stream_updates"); // Changed URL
           setEventSource(newEventSource);
         } else {
           throw new Error(data.error); // Throw error for consistent handling
@@ -102,7 +102,7 @@ const BrowserUse: React.FC = () => {
 
   const closeBrowser = useCallback(async () => { // Use useCallback for consistency
     try {
-      const response = await fetch("http://localhost:5000/browse/close_browser", { method: "POST" });
+      const response = await fetch("https://ushapangeni.com.np/browse/close_browser", { method: "POST" }); // Changed URL
       const data = await response.json();
        if (!response.ok) { // Check for HTTP errors
         throw new Error(data.message || "Failed to close browser");

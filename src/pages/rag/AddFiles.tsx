@@ -1,4 +1,3 @@
-// AddFiles.tsx
 import { useState, useEffect } from "react";
 import { Loader2, Check, Link as LinkIcon, File, DownloadCloud } from "lucide-react";
 
@@ -51,7 +50,7 @@ const AddFiles = () => {
     // Function to fetch niches
     const fetchNiches = async () => {
         try {
-            const response = await fetch("http://127.0.0.1:5000/get-niches");
+            const response = await fetch("https://ushapangeni.com.np/get-niches"); // Changed URL
             const data = await response.json();
 
             if (data.success) {
@@ -81,7 +80,7 @@ const AddFiles = () => {
         setLogs([]); // Clear previous logs
 
         try {
-            const response = await fetch("http://127.0.0.1:5000/process-documents", {
+            const response = await fetch("https://ushapangeni.com.np/process-documents", { // Changed URL
                 method: "POST",
             });
 
@@ -123,7 +122,7 @@ const AddFiles = () => {
                 .map(url => url.trim())
                 .filter(url => url.length > 0);
 
-            const response = await fetch("http://127.0.0.1:5000/process-urls", {
+            const response = await fetch("https://ushapangeni.com.np/process-urls", { // Changed URL
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -165,7 +164,7 @@ const AddFiles = () => {
         setExtractedPdfCount(0);
 
         try {
-            const response = await fetch("http://127.0.0.1:5000/extract-pdfs", {
+            const response = await fetch("https://ushapangeni.com.np/extract-pdfs", { // Changed URL
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
