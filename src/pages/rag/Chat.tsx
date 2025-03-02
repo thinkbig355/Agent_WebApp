@@ -42,7 +42,7 @@ const Chat = () => {
     {
       id: "welcome",
       type: "bot",
-      content: "Hello! I'm your document assistant. Ask me anything about your knowledge base.",
+      content: "Hello Ishan! Ask me anything about your knowledge base.",
       timestamp: new Date(),
       showDetails: false
     }
@@ -269,11 +269,11 @@ const Chat = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-[#FFF5F5] via-[#B8C5E9] to-[#5B6BA9]">
-      {/* Header  */}
-      <header className="bg-white/90 backdrop-blur-xl border-b border-[#B8C5E9]/50 py-4 px-6 flex items-center justify-between shadow-sm">
+      {/* Header - Made sticky with top-16 to position it right below the Navigation bar */}
+      <header className="bg-white/90 backdrop-blur-xl border-b border-[#B8C5E9]/50 py-4 px-6 flex items-center justify-between shadow-sm sticky top-16 z-40">
         <div className="flex items-center space-x-3">
-            <div className="bg-[#F0F4FF] p-2 rounded-full">
-              <Bot className="h-6 w-6 text-[#5B6BA9]" />
+          <div className="bg-[#F0F4FF] p-2 rounded-full">
+            <Bot className="h-6 w-6 text-[#5B6BA9]" />
           </div>
           <h1 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#1E2A5A] to-[#5B6BA9]">Document Assistant</h1>
         </div>
@@ -301,8 +301,8 @@ const Chat = () => {
                   className="flex items-center px-4 py-2 hover:bg-[#F0F4FF] cursor-pointer"
                   onClick={() => toggleNiche(niche.value)}
                 >
-                    <div className="w-5 h-5 border border-[#B8C5E9] rounded flex items-center justify-center mr-3">
-                        {selectedNiches.includes(niche.value) && <Check className="w-4 h-4 text-[#5B6BA9]" />}
+                  <div className="w-5 h-5 border border-[#B8C5E9] rounded flex items-center justify-center mr-3">
+                    {selectedNiches.includes(niche.value) && <Check className="w-4 h-4 text-[#5B6BA9]" />}
                   </div>
                   <span className="text-sm text-[#1E2A5A]">{niche.label}</span>
                 </div>
@@ -312,8 +312,8 @@ const Chat = () => {
         </div>
       </header>
 
-       {/* Main content area */}
-        <div  className="flex-1 overflow-y-auto pt-16 pb-24">
+      {/* Main content area - Removed pt-16 and added pt-4 for spacing */}
+      <div className="flex-1 overflow-y-auto pt-4 pb-24">
         <div className="max-w-3xl mx-auto px-4 space-y-4">
           {messages.map((message) => (
             <div
@@ -322,15 +322,15 @@ const Chat = () => {
             >
               <div
                 className={`
-                  max-w-[85%] rounded-lg p-4
-                  ${message.type === 'user'
+                      max-w-[85%] rounded-lg p-4
+                      ${message.type === 'user'
                     ? 'bg-[#5B6BA9] text-white rounded-br-none shadow-md ml-8'
                     : 'bg-white border border-[#B8C5E9]/50 shadow-md rounded-bl-none mr-8'
                   }
-                `}
+                    `}
               >
                 <div className="flex items-center space-x-2 mb-2">
-                    <div className={`p-1 rounded-full ${message.type === 'user' ? 'bg-[#1E2A5A]' : 'bg-[#F0F4FF]'}`}>
+                  <div className={`p-1 rounded-full ${message.type === 'user' ? 'bg-[#1E2A5A]' : 'bg-[#F0F4FF]'}`}>
                     {message.type === 'user'
                       ? <User className="h-4 w-4 text-white" />
                       : <Bot className="h-4 w-4 text-[#5B6BA9]" />
@@ -342,8 +342,8 @@ const Chat = () => {
                 </div>
 
                 {message.isLoading ? (
-                    <div className="flex items-center space-x-2">
-                        <Loader2 className="h-4 w-4 animate-spin text-[#1E2A5A]" />
+                  <div className="flex items-center space-x-2">
+                    <Loader2 className="h-4 w-4 animate-spin text-[#1E2A5A]" />
                     <span className="text-[#1E2A5A]">Looking Your Documents...</span>
                   </div>
                 ) : (
@@ -369,14 +369,14 @@ const Chat = () => {
                               animate={{ opacity: 1, height: 'auto' }}
                               exit={{ opacity: 0, height: 0 }}
                               transition={{ duration: 0.2 }}
-                                  className="mt-3 pt-3 border-t border-[#B8C5E9]/50 overflow-hidden"
+                              className="mt-3 pt-3 border-t border-[#B8C5E9]/50 overflow-hidden"
                             >
                               {message.niches_used && message.niches_used.length > 0 && (
                                 <div className="mb-3">
-                                      <h4 className="text-xs font-medium text-[#1E2A5A] mb-1">Niches Used:</h4>
+                                  <h4 className="text-xs font-medium text-[#1E2A5A] mb-1">Niches Used:</h4>
                                   <div className="flex flex-wrap gap-1">
                                     {message.niches_used.map((niche, index) => (
-                                        <span key={index} className="px-2 py-1 bg-[#B8C5E9]/30 rounded-full text-[#1E2A5A] text-xs">
+                                      <span key={index} className="px-2 py-1 bg-[#B8C5E9]/30 rounded-full text-[#1E2A5A] text-xs">
                                         {niche}
                                       </span>
                                     ))}
@@ -385,19 +385,19 @@ const Chat = () => {
                               )}
 
                               <div>
-                                    <h4 className="text-xs font-medium text-[#1E2A5A] mb-1 flex items-center">
+                                <h4 className="text-xs font-medium text-[#1E2A5A] mb-1 flex items-center">
                                   <ExternalLink className="h-3 w-3 mr-1" />
                                   Sources:
                                 </h4>
-                                    <ul className="text-xs text-[#1E2A5A] space-y-1">
+                                <ul className="text-xs text-[#1E2A5A] space-y-1">
                                   {message.sources.map((source, index) => (
-                                      <li key={index} className="truncate hover:text-[#5B6BA9]">
+                                    <li key={index} className="truncate hover:text-[#5B6BA9]">
                                       {source}
                                     </li>
                                   ))}
                                 </ul>
                                 {message.chunks_used && (
-                                    <p className="text-xs text-[#1E2A5A] mt-1">
+                                  <p className="text-xs text-[#1E2A5A] mt-1">
                                     Chunks used: {message.chunks_used}
                                   </p>
                                 )}
@@ -441,10 +441,10 @@ const Chat = () => {
       </div>
 
       {/* Input area */}
-        <div className="border-t border-[#B8C5E9]/50 py-4 px-4 fixed bottom-0 left-0 right-0 z-10 bg-[#F0F4FF]">
+      <div className="border-t border-[#B8C5E9]/50 py-4 px-4 fixed bottom-0 left-0 right-0 z-10 bg-[#F0F4FF]">
         <div className="max-w-3xl mx-auto">
           <div className="flex items-end space-x-3">
-                <div className="flex-1 relative">
+            <div className="flex-1 relative">
               <textarea
                 ref={inputRef}
                 value={question}
@@ -453,16 +453,16 @@ const Chat = () => {
                 placeholder="Type your question here..."
                 disabled={loading}
                 rows={1}
-                    className="w-full p-3 bg-white border border-[#B8C5E9] rounded-lg focus:ring-2 focus:ring-[#5B6BA9] focus:border-[#5B6BA9] resize-none min-h-[50px] max-h-[150px] transition-all shadow-sm"
+                className="w-full p-3 bg-white border border-[#B8C5E9] rounded-lg focus:ring-2 focus:ring-[#5B6BA9] focus:border-[#5B6BA9] resize-none min-h-[50px] max-h-[150px] transition-all shadow-sm"
               />
-                  <div className="absolute right-3 bottom-3 text-xs text-[#1E2A5A]">
+              <div className="absolute right-3 bottom-3 text-xs text-[#1E2A5A]">
                 {loading ? "" : "Press Enter to send"}
               </div>
             </div>
-                <button
+            <button
               onClick={askQuestion}
               disabled={loading || !question.trim()}
-                  className="p-3 bg-[#1E2A5A] text-white rounded-lg hover:bg-[#5B6BA9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-sm"
+              className="p-3 bg-[#1E2A5A] text-white rounded-lg hover:bg-[#5B6BA9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 shadow-sm"
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
