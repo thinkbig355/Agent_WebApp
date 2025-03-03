@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { Loader2, Check, Send, ChevronDown, Bot, User, Filter, X, ExternalLink, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Result data interface
 interface ResultData {
   answer: string;
   sources: string[];
@@ -11,13 +10,11 @@ interface ResultData {
   error?: string;
 }
 
-// Niche option interface
 interface NicheOption {
   value: string;
   label: string;
 }
 
-// Message interface
 interface Message {
   id: string;
   type: 'user' | 'bot';
@@ -31,12 +28,11 @@ interface Message {
 }
 
 const Chat = () => {
-  // State variables
   const [loading, setLoading] = useState(false);
   const [question, setQuestion] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [availableNiches, setAvailableNiches] = useState<NicheOption[]>([]);
-  const [selectedNiches, setSelectedNiches] = useState<string[]>(["all"]);
+  const [selectedNiches, setSelectedNiches] = useState<string[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -51,12 +47,10 @@ const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Fetch niches on component mount
   useEffect(() => {
     fetchNiches();
   }, []);
 
-  // Scroll to bottom when messages change
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -67,21 +61,15 @@ const Chat = () => {
 
   const fetchNiches = async () => {
     try {
-      const response = await fetch("https://ushapangeni.com.np/get-niches"); // Changed to use the Cloudflare Tunnel URL
+      const response = await fetch("https://ushapangeni.com.np/get-niches");
       const data = await response.json();
-
       if (data.success) {
-        // Create niche options with proper capitalization
         const niches = data.niches.map((niche: string) => ({
           value: niche,
           label: niche.charAt(0).toUpperCase() + niche.slice(1).replace('_', ' ')
         }));
-
-        // Add the "All" option
-        setAvailableNiches([
-          { value: "all", label: "All Niches" },
-          ...niches
-        ]);
+        setAvailableNiches(niches);
+        // No default niche selection
       } else {
         setError(data.error || "Failed to fetch niches");
       }
@@ -90,16 +78,32 @@ const Chat = () => {
     }
   };
 
+  const toggleNiche = (niche: string) => {
+    setSelectedNiches(prev => {
+      if (prev.includes(niche)) return prev.filter(item => item !== niche);
+      return [...prev, niche];
+    });
+  };
+
+  const getSelectedNichesText = () => {
+    if (!selectedNiches.length) return "General Search";
+    if (selectedNiches.length <= 2) {
+      return selectedNiches
+        .map(niche => availableNiches.find(n => n.value === niche)?.label)
+        .filter(Boolean)
+        .join(", ");
+    }
+    return `${selectedNiches.length} niches selected`;
+  };
+
   const askQuestion = async () => {
     if (!question.trim()) return;
 
     setLoading(true);
     setError(null);
 
-    // Generate a unique ID for this message pair
     const messageId = Date.now().toString();
 
-    // Add user message
     const userMessage: Message = {
       id: `user-${messageId}`,
       type: 'user',
@@ -107,7 +111,6 @@ const Chat = () => {
       timestamp: new Date()
     };
 
-    // Add loading bot message
     const pendingBotMessage: Message = {
       id: `bot-${messageId}`,
       type: 'bot',
@@ -118,80 +121,84 @@ const Chat = () => {
     };
 
     setMessages(prev => [...prev, userMessage, pendingBotMessage]);
-
-    // Clear input
     setQuestion("");
 
     try {
-      const response = await fetch("https://ushapangeni.com.np/query", { // Changed to use the Cloudflare Tunnel URL
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          question: userMessage.content,
-          selectedNiches
-        }),
-      });
+      let response;
+      let data;
 
-      const data = await response.json();
+      if (selectedNiches.length === 0) {
+        response = await fetch("https://ushapangeni.com.np/raw-query", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question: userMessage.content }),
+        });
+        data = await response.json();
 
-      if (data.error) {
-        setError(data.error);
-        // Update the pending message with error
-        setMessages(prev =>
-          prev.map(msg =>
-            msg.id === `bot-${messageId}`
-              ? {
-                  ...msg,
-                  content: `Error: ${data.error}`,
-                  isLoading: false
-                }
-              : msg
-          )
-        );
+         if (data.error) {
+            setError(data.error);
+             setMessages(prev => prev.map(msg => msg.id === `bot-${messageId}` ? { ...msg, content: `Error: ${data.error}`, isLoading: false } : msg));
+         } else {
+            setMessages(prev => prev.map(msg => msg.id === `bot-${messageId}` ? { ...msg, content: data.answer, isLoading: false } : msg));
+         }
+
       } else {
-        // Update the pending message with the result
-        setMessages(prev =>
-          prev.map(msg =>
-            msg.id === `bot-${messageId}`
-              ? {
-                  ...msg,
-                  content: data.answer,
-                  sources: data.sources,
-                  niches_used: data.niches_used,
-                  chunks_used: data.chunks_used,
-                  isLoading: false,
-                  showDetails: false
-                }
-              : msg
-          )
-        );
+        response = await fetch("https://ushapangeni.com.np/query", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            question: userMessage.content,
+            selectedNiches
+          }),
+        });
+        data = await response.json();
+        if (data.error) {
+            setError(data.error);
+            setMessages(prev =>
+              prev.map(msg =>
+                msg.id === `bot-${messageId}`
+                  ? {
+                      ...msg,
+                      content: `Error: ${data.error}`,
+                      isLoading: false
+                    }
+                  : msg
+              )
+            );
+          } else {
+            setMessages(prev =>
+              prev.map(msg =>
+                msg.id === `bot-${messageId}`
+                  ? {
+                      ...msg,
+                      content: data.answer,
+                      sources: data.sources,
+                      niches_used: data.niches_used,
+                      chunks_used: data.chunks_used,
+                      isLoading: false,
+                      showDetails: false
+                    }
+                  : msg
+              )
+            );
+          }
       }
+
+
     } catch (err: any) {
       const errorMessage = err.message || "An error occurred while processing your request.";
       setError(errorMessage);
+        setMessages(prev => prev.map(msg => msg.id === `bot-${messageId}` ? { ...msg, content: `Error: ${errorMessage}`, isLoading: false } : msg));
 
-      // Update the pending message with error
-      setMessages(prev =>
-        prev.map(msg =>
-          msg.id === `bot-${messageId}`
-            ? {
-                ...msg,
-                content: `Error: ${errorMessage}`,
-                isLoading: false
-              }
-            : msg
-        )
-      );
     } finally {
       setLoading(false);
-      // Focus the input field after sending
       setTimeout(() => {
         inputRef.current?.focus();
       }, 100);
     }
   };
+
+
 
   const toggleMessageDetails = (messageId: string) => {
     setMessages(prev =>
@@ -201,47 +208,6 @@ const Chat = () => {
           : msg
       )
     );
-  };
-
-  const toggleNiche = (niche: string) => {
-    setSelectedNiches(prev => {
-      // If "all" is being selected, only select "all"
-      if (niche === "all") {
-        return ["all"];
-      }
-
-      // If we're selecting something other than "all", remove "all" from selection
-      let newSelection = prev.filter(item => item !== "all");
-
-      // Toggle the selected niche
-      if (newSelection.includes(niche)) {
-        newSelection = newSelection.filter(item => item !== niche);
-      } else {
-        newSelection.push(niche);
-      }
-
-      // If nothing is selected, default to "all"
-      if (newSelection.length === 0) {
-        return ["all"];
-      }
-
-      return newSelection;
-    });
-  };
-
-  const getSelectedNichesText = () => {
-    if (selectedNiches.includes("all")) {
-      return "All Niches";
-    }
-
-    if (selectedNiches.length <= 2) {
-      return selectedNiches
-        .map(niche => availableNiches.find(n => n.value === niche)?.label)
-        .filter(Boolean) // Ensure no undefined values
-        .join(", ");
-    }
-
-    return `${selectedNiches.length} niches selected`;
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -254,11 +220,7 @@ const Chat = () => {
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const textarea = e.target;
     setQuestion(textarea.value);
-
-    // Reset height to auto to get the correct scrollHeight
     textarea.style.height = 'auto';
-
-    // Set the height to scrollHeight to fit content
     const newHeight = Math.min(textarea.scrollHeight, 150);
     textarea.style.height = `${newHeight}px`;
   };
@@ -269,7 +231,6 @@ const Chat = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-[#FFF5F5] via-[#B8C5E9] to-[#5B6BA9]">
-      {/* Header - Made sticky with top-16 to position it right below the Navigation bar */}
       <header className="bg-white/90 backdrop-blur-xl border-b border-[#B8C5E9]/50 py-4 px-6 flex items-center justify-between shadow-sm sticky top-16 z-40">
         <div className="flex items-center space-x-3">
           <div className="bg-[#F0F4FF] p-2 rounded-full">
@@ -278,7 +239,6 @@ const Chat = () => {
           <h1 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#1E2A5A] to-[#5B6BA9]">Document Assistant</h1>
         </div>
 
-        {/* Niche filter button */}
         <div className="relative">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -289,7 +249,6 @@ const Chat = () => {
             <ChevronDown className="h-4 w-4" />
           </button>
 
-          {/* Niche dropdown */}
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-64 bg-white border border-[#B8C5E9] rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
               <div className="p-2 border-b border-[#B8C5E9]/50">
@@ -312,7 +271,6 @@ const Chat = () => {
         </div>
       </header>
 
-      {/* Main content area - Removed pt-16 and added pt-4 for spacing */}
       <div className="flex-1 overflow-y-auto pt-4 pb-24">
         <div className="max-w-3xl mx-auto px-4 space-y-4">
           {messages.map((message) => (
@@ -322,12 +280,12 @@ const Chat = () => {
             >
               <div
                 className={`
-                      max-w-[85%] rounded-lg p-4
-                      ${message.type === 'user'
+                          max-w-[85%] rounded-lg p-4
+                          ${message.type === 'user'
                     ? 'bg-[#5B6BA9] text-white rounded-br-none shadow-md ml-8'
                     : 'bg-white border border-[#B8C5E9]/50 shadow-md rounded-bl-none mr-8'
                   }
-                    `}
+                        `}
               >
                 <div className="flex items-center space-x-2 mb-2">
                   <div className={`p-1 rounded-full ${message.type === 'user' ? 'bg-[#1E2A5A]' : 'bg-[#F0F4FF]'}`}>
@@ -343,8 +301,15 @@ const Chat = () => {
 
                 {message.isLoading ? (
                   <div className="flex items-center space-x-2">
-                    <Loader2 className="h-4 w-4 animate-spin text-[#1E2A5A]" />
-                    <span className="text-[#1E2A5A]">Looking Your Documents...</span>
+                    {/* Show "Looking..." if niches are selected, otherwise show general loading */}
+                    {selectedNiches.length > 0 ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin text-[#1E2A5A]" />
+                        <span className="text-[#1E2A5A]">Looking Your Documents...</span>
+                      </>
+                    ) : (
+                      <Loader2 className="h-4 w-4 animate-spin text-[#1E2A5A]" />
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -440,7 +405,6 @@ const Chat = () => {
         </div>
       </div>
 
-      {/* Input area */}
       <div className="border-t border-[#B8C5E9]/50 py-4 px-4 fixed bottom-0 left-0 right-0 z-10 bg-[#F0F4FF]">
         <div className="max-w-3xl mx-auto">
           <div className="flex items-end space-x-3">
