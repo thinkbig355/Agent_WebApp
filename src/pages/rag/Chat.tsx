@@ -1,3 +1,4 @@
+// Chat.tsx
 import { useState, useEffect, useRef } from "react";
 import { Loader2, Check, Send, ChevronDown, Bot, User, Filter, X, ExternalLink, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,7 +33,7 @@ const Chat = () => {
   const [question, setQuestion] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [availableNiches, setAvailableNiches] = useState<NicheOption[]>([]);
-  const [selectedNiches, setSelectedNiches] = useState<string[]>([]);
+  const [selectedNiches, setSelectedNiches] = useState<string[]>([]);  // Store *values*
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -64,11 +65,8 @@ const Chat = () => {
       const response = await fetch("https://ushapangeni.com.np/get-niches");
       const data = await response.json();
       if (data.success) {
-        const niches = data.niches.map((niche: string) => ({
-          value: niche,
-          label: niche.charAt(0).toUpperCase() + niche.slice(1).replace('_', ' ')
-        }));
-        setAvailableNiches(niches);
+          // Use value and label
+        setAvailableNiches(data.niches);
         // No default niche selection
       } else {
         setError(data.error || "Failed to fetch niches");
@@ -148,7 +146,7 @@ const Chat = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             question: userMessage.content,
-            selectedNiches
+            selectedNiches // Send *values*
           }),
         });
         data = await response.json();
@@ -173,7 +171,7 @@ const Chat = () => {
                       ...msg,
                       content: data.answer,
                       sources: data.sources,
-                      niches_used: data.niches_used,
+                      niches_used: data.niches_used, // Received display names
                       chunks_used: data.chunks_used,
                       isLoading: false,
                       showDetails: false
@@ -183,7 +181,6 @@ const Chat = () => {
             );
           }
       }
-
 
     } catch (err: any) {
       const errorMessage = err.message || "An error occurred while processing your request.";
@@ -197,8 +194,6 @@ const Chat = () => {
       }, 100);
     }
   };
-
-
 
   const toggleMessageDetails = (messageId: string) => {
     setMessages(prev =>
