@@ -71,10 +71,10 @@ const Home: React.FC = () => {
       return;
     }
 
-    // --- THEN, wait 35 seconds, and THEN start repeated checks ---
+    // --- THEN, wait 60 seconds, and THEN start repeated checks ---
     setTimeout(() => {
         let checkCount = 0;
-        const totalChecks = (60-35)/5 + 1;
+        const totalChecks = (120-60)/5 + 1;
 
         const intervalId = setInterval(async () => {
             checkCount++;
@@ -109,7 +109,7 @@ const Home: React.FC = () => {
 
         }, 5000);
 
-    }, 35000); // Wait 35 seconds *before* starting the interval
+    }, 60000); // Wait 60 seconds *before* starting the interval
   };
 
   // Pulse animation for the status indicator

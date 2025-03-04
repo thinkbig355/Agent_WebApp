@@ -18,10 +18,11 @@ interface NicheOption {
 }
 
 const AddFiles = () => {
-    const [processLoading, setProcessLoading] = useState(false); // Separate loading state for process/extract/youtube
-    const [syncLoading, setSyncLoading] = useState(false); // Separate loading state for sync documents
+    const [processLoading, setProcessLoading] = useState(false);
+    const [syncLoading, setSyncLoading] = useState(false);
     const [logs, setLogs] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [infoMessage, setInfoMessage] = useState<string | null>(null); // New state for informational messages
     const [availableNiches, setAvailableNiches] = useState<NicheOption[]>([]);
     const [results, setResults] = useState<URLProcessingResult[]>([]);
     const [mode, setMode] = useState<'process' | 'extract' | 'youtube'>('process');
@@ -29,18 +30,14 @@ const AddFiles = () => {
     const [selectedNiche, setSelectedNiche] = useState("");
     const [nicheDropdownOpen, setNicheDropdownOpen] = useState(false);
     const [extractedPdfCount, setExtractedPdfCount] = useState(0);
-    const [newNicheInput, setNewNicheInput] = useState(""); // For adding new niches
+    const [newNicheInput, setNewNicheInput] = useState("");
 
     const fetchNiches = useCallback(async () => {
         try {
             const response = await fetch("https://ushapangeni.com.np/get-niches");
             const data = await response.json();
             if (data.success) {
-                const niches = data.niches.map((niche: string) => ({
-                    value: niche,
-                    label: niche.charAt(0).toUpperCase() + niche.slice(1).replace('_', ' ')
-                }));
-                setAvailableNiches(niches);
+                setAvailableNiches(data.niches);
             } else {
                 setError(data.error || "Failed to fetch niches");
             }
@@ -68,7 +65,7 @@ const AddFiles = () => {
             if (data.success) {
                 setAvailableNiches(prev => [
                     ...prev,
-                    { value: data.niche, label: data.niche.charAt(0).toUpperCase() + data.niche.slice(1).replace('_', ' ') }
+                    { value: data.niche, label: data.display_niche }
                 ]);
                 setNewNicheInput("");
                 setError(null);
@@ -80,17 +77,17 @@ const AddFiles = () => {
         }
     };
 
-    const deleteNiche = async (niche: string) => {
+    const deleteNiche = async (nicheValue: string) => {
         try {
             const response = await fetch("https://ushapangeni.com.np/delete-niche", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ niche }),
+                body: JSON.stringify({ niche: nicheValue }),
             });
             const data = await response.json();
             if (data.success) {
-                setAvailableNiches(prev => prev.filter(n => n.value !== niche));
-                if (selectedNiche === niche) setSelectedNiche("");
+                setAvailableNiches(prev => prev.filter(n => n.value !== nicheValue));
+                if (selectedNiche === nicheValue) setSelectedNiche("");
                 setError(null);
             } else {
                 setError(data.error || "Failed to delete niche");
@@ -101,7 +98,7 @@ const AddFiles = () => {
     };
 
     const syncDocuments = async () => {
-        setSyncLoading(true); // Set sync loading to true
+        setSyncLoading(true);
         setError(null);
         setLogs([]);
         try {
@@ -112,7 +109,7 @@ const AddFiles = () => {
         } catch (err: any) {
             setError(err.message || "An error occurred during document sync.");
         } finally {
-            setSyncLoading(false); // Set sync loading to false
+            setSyncLoading(false);
         }
     };
 
@@ -126,8 +123,9 @@ const AddFiles = () => {
             return;
         }
 
-        setProcessLoading(true); // Set process loading to true
+        setProcessLoading(true);
         setError(null);
+        setInfoMessage(null); // Clear any previous info message
         setResults([]);
 
         try {
@@ -155,21 +153,24 @@ const AddFiles = () => {
 
             if (data.success) {
                 if (mode === 'extract') {
-                    setExtractedPdfCount(data.count)
+                    setExtractedPdfCount(data.count);
                 }
                 if (data.results) {
-                    setResults(data.results); // Set results for URLs and PDFs
+                    setResults(data.results);
                 } else {
-                    setResults([data]); // For youtub
+                    setResults([data]);
                 }
-
             } else {
                 setError(data.error || `An unknown error occurred during ${mode} processing.`);
             }
         } catch (err: any) {
-            setError(err.message || `An error occurred during ${mode} processing.`);
+            if (mode === 'youtube') {
+                setInfoMessage("Seems like you have lots of videos, which may take some time to load in the system!");
+            } else {
+                setError(err.message || `An error occurred during ${mode} processing.`);
+            }
         } finally {
-            setProcessLoading(false); // Set process loading to false
+            setProcessLoading(false);
         }
     };
 
@@ -181,7 +182,7 @@ const AddFiles = () => {
         } else if (mode === 'youtube') {
             return "https://www.youtube.com/watch?v=...";
         }
-        return ""; // Should never happen, but good practice
+        return "";
     };
 
     const inputLabel = () => {
@@ -194,11 +195,12 @@ const AddFiles = () => {
         }
         return "";
     };
+
     const getIcon = () => {
         if (mode === 'process') return <LinkIcon className="mr-2 h-4 w-4" />;
         if (mode === 'extract') return <DownloadCloud className="mr-2 h-4 w-4" />;
         if (mode === 'youtube') return <PlayCircle className="mr-2 h-4 w-4" />;
-        return null; // Should never reach here
+        return null;
     };
 
     return (
@@ -276,7 +278,7 @@ const AddFiles = () => {
                                         value={input}
                                         onChange={(e) => setInput(e.target.value)}
                                         placeholder={placeholderText()}
-                                        disabled={processLoading} // Use processLoading here
+                                        disabled={processLoading}
                                         className="w-full min-h-[100px] p-4 rounded-lg border border-[#B8C5E9] bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#5B6BA9] focus:border-transparent resize-none transition-all duration-200 ease-in-out disabled:opacity-50"
                                     />
                                 </div>
@@ -301,7 +303,6 @@ const AddFiles = () => {
                                                             URL
                                                         </th>
                                                         {(mode !== 'youtube') && <th className="px-4 py-2 text-left text-xs font-medium text-[#1E2A5A] uppercase tracking-wider">Type</th>}
-
                                                         {(mode !== 'youtube') && <th className="px-4 py-2 text-left text-xs font-medium text-[#1E2A5A] uppercase tracking-wider">
                                                             Size
                                                         </th>}
@@ -317,9 +318,7 @@ const AddFiles = () => {
                                                             <td className="px-4 py-2 text-sm text-[#1E2A5A] truncate max-w-[200px]">
                                                                 {result.url}
                                                             </td>
-
                                                             {(mode !== 'youtube') && <td className="px-4 py-2 text-sm text-[#1E2A5A]">{result.content_type || "unknown"}</td>}
-
                                                             {(mode !== 'youtube') && <td className="px-4 py-2 text-sm text-[#1E2A5A]">
                                                                 {result.characters
                                                                     ? typeof result.characters === 'number'
@@ -352,7 +351,7 @@ const AddFiles = () => {
                         <div className="flex justify-end">
                             <button
                                 onClick={syncDocuments}
-                                disabled={syncLoading} // Use syncLoading here
+                                disabled={syncLoading}
                                 className="inline-flex items-center px-4 py-2 bg-[#1E2A5A] text-white rounded-lg hover:bg-[#5B6BA9] transition-colors disabled:opacity-50"
                             >
                                 {syncLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
@@ -369,6 +368,13 @@ const AddFiles = () => {
                                         <li key={index} className="text-sm text-[#1E2A5A]">{log}</li>
                                     ))}
                                 </ul>
+                            </div>
+                        )}
+
+                        {/* Informational Message Display */}
+                        {infoMessage && (
+                            <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
+                                <span className="block sm:inline">{infoMessage}</span>
                             </div>
                         )}
 
