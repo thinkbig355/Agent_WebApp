@@ -187,11 +187,11 @@ const AddFiles = () => {
 
     const inputLabel = () => {
         if (mode === 'process') {
-            return "Paste URLs (Space-separated, comma-separated, or one URL per line.)";
+            return "Paste URLs (No Limit)";
         } else if (mode === 'extract') {
-            return "Enter URL";
+            return "Enter URL (One at a time)";
         } else if (mode === 'youtube') {
-            return "Enter YouTube URL";
+            return "Enter YouTube URLs (No Limit)";
         }
         return "";
     };
@@ -218,13 +218,13 @@ const AddFiles = () => {
                         {/* Mode Toggle */}
                         <div className="flex justify-center space-x-4">
                             <button onClick={() => setMode('process')} className={`px-6 py-2 rounded-lg transition-colors ${mode === 'process' ? 'bg-[#1E2A5A] text-white' : 'bg-[#F0F4FF] text-[#1E2A5A] hover:bg-[#B8C5E9]'}`}>Process URLs</button>
-                            <button onClick={() => setMode('extract')} className={`px-6 py-2 rounded-lg transition-colors ${mode === 'extract' ? 'bg-[#1E2A5A] text-white' : 'bg-[#F0F4FF] text-[#1E2A5A] hover:bg-[#B8C5E9]'}`}>Extract PDFs</button>
+                            <button onClick={() => setMode('extract')} className={`px-6 py-2 rounded-lg transition-colors ${mode === 'extract' ? 'bg-[#1E2A5A] text-white' : 'bg-[#F0F4FF] text-[#1E2A5A] hover:bg-[#B8C5E9]'}`}>PDF Extraction</button>
                             <button onClick={() => setMode('youtube')} className={`px-6 py-2 rounded-lg transition-colors ${mode === 'youtube' ? 'bg-[#1E2A5A] text-white' : 'bg-[#F0F4FF] text-[#1E2A5A] hover:bg-[#B8C5E9]'}`}>YouTube</button>
                         </div>
 
                         <div className="bg-[#F0F4FF] rounded-lg p-6 border border-[#B8C5E9]/50">
                             <h2 className="text-xl font-semibold text-[#1E2A5A] mb-4">
-                                {mode === 'process' ? 'Process URLs' : mode === 'extract' ? 'Extract PDFs from URL' : 'YouTube Transcription'}
+                                {mode === 'process' ? 'Supports Article, Pdf, Jpg' : mode === 'extract' ? 'Process all pdfs from a page' : 'YouTube Video/Playlist'}
                             </h2>
                             <div className="space-y-4">
                                 {/* Niche Selection */}
