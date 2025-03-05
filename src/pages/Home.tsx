@@ -130,11 +130,11 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF5F5] via-[#B8C5E9] to-[#5B6BA9] to-[#1E2A5A] font-sans p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-[#0F1522] font-sans p-4 relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
-          className="absolute top-[10%] left-[10%] w-64 h-64 rounded-full bg-[#4B63C8]/10 blur-3xl"
+          className="absolute top-[10%] left-[10%] w-64 h-64 rounded-full bg-[#1E2D4D]/10 blur-3xl"
           animate={{
             x: [0, 30, 0],
             y: [0, -30, 0],
@@ -146,7 +146,7 @@ const Home: React.FC = () => {
           }}
         />
         <motion.div
-          className="absolute bottom-[20%] right-[15%] w-80 h-80 rounded-full bg-[#2D3A8C]/20 blur-3xl"
+          className="absolute bottom-[20%] right-[15%] w-80 h-80 rounded-full bg-[#111B33]/20 blur-3xl"
           animate={{
             x: [0, -40, 0],
             y: [0, 40, 0],
@@ -166,7 +166,7 @@ const Home: React.FC = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative z-10 bg-[#1A2140]/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-[#2D3A8C]/20 p-8 md:p-12 text-center space-y-10 w-full max-w-2xl"
+          className="relative z-10 bg-[#1A2233]/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-[#2D3A8C]/20 p-8 md:p-12 text-center space-y-10 w-full max-w-2xl"
         >
           <motion.div
             initial={{ opacity: 0, y: -20 }}

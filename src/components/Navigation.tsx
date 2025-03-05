@@ -29,16 +29,16 @@ const Navigation = () => {
   }, [location.pathname]);
 
   return (
-    <nav className="bg-white/80 backdrop-blur-sm border-b border-rag-200 sticky top-0 z-50">
+    <nav className="bg-[#0F1522]/80 backdrop-blur-sm border-b border-[#2D3A8C]/20 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center"> {/* Added items-center here */}
+        <div className="flex justify-between h-16 items-center">
           <div className="flex space-x-8">
             <Link
               to="/"
               className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
                 isActive("/")
-                  ? "border-rag-900 text-rag-900"
-                  : "border-transparent text-rag-600 hover:text-rag-900 hover:border-rag-300"
+                  ? "border-[#A5B4FC] text-[#FFFFFF]"
+                  : "border-transparent text-[#A9B4C2] hover:text-[#FFFFFF] hover:border-[#3A9BA4]"
               }`}
             >
               Home
@@ -49,8 +49,8 @@ const Navigation = () => {
               <div
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors cursor-pointer ${
                   isRagActive()
-                    ? "border-rag-900 text-rag-900"
-                    : "border-transparent text-rag-600 hover:text-rag-900 hover:border-rag-300"
+                    ? "border-[#A5B4FC] text-[#FFFFFF]"
+                    : "border-transparent text-[#A9B4C2] hover:text-[#FFFFFF] hover:border-[#3A9BA4]"
                 }`}
                 onMouseEnter={() => setRagDropdownOpen(true)}
                 onClick={() => setRagDropdownOpen(!ragDropdownOpen)}
@@ -68,19 +68,19 @@ const Navigation = () => {
               </div>
 
               {ragDropdownOpen && (
-                <div className="absolute left-0 mt-2 w-48 bg-white border border-rag-200 rounded-md shadow-lg z-10">
+                <div className="absolute left-0 mt-2 w-48 bg-[#1A2233] border border-[#2D3A8C]/20 rounded-md shadow-lg z-10">
                   <Link
                     to="/rag/add-files"
-                    className={`block px-4 py-2 text-sm text-rag-600 hover:bg-rag-50 hover:text-rag-900 ${
-                      isActive("/rag/add-files") ? "bg-rag-50 text-rag-900" : ""
+                    className={`block px-4 py-2 text-sm text-[#A9B4C2] hover:bg-[#2A3548] hover:text-[#FFFFFF] ${
+                      isActive("/rag/add-files") ? "bg-[#2A3548] text-[#FFFFFF]" : ""
                     }`}
                   >
                     Add Files
                   </Link>
                   <Link
                     to="/rag/chat"
-                    className={`block px-4 py-2 text-sm text-rag-600 hover:bg-rag-50 hover:text-rag-900 ${
-                      isActive("/rag/chat") ? "bg-rag-50 text-rag-900" : ""
+                    className={`block px-4 py-2 text-sm text-[#A9B4C2] hover:bg-[#2A3548] hover:text-[#FFFFFF] ${
+                      isActive("/rag/chat") ? "bg-[#2A3548] text-[#FFFFFF]" : ""
                     }`}
                   >
                     Chat
@@ -93,8 +93,8 @@ const Navigation = () => {
               to="/browser-use"
               className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
                 isActive("/browser-use")
-                  ? "border-rag-900 text-rag-900"
-                  : "border-transparent text-rag-600 hover:text-rag-900 hover:border-rag-300"
+                  ? "border-[#A5B4FC] text-[#FFFFFF]"
+                  : "border-transparent text-[#A9B4C2] hover:text-[#FFFFFF] hover:border-[#3A9BA4]"
               }`}
             >
               Browser Use
