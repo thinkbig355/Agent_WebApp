@@ -30,6 +30,7 @@ const AddFiles = () => {
     const [nicheDropdownOpen, setNicheDropdownOpen] = useState(false);
     const [extractedPdfCount, setExtractedPdfCount] = useState(0);
     const [newNicheInput, setNewNicheInput] = useState("");
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
 
     const fetchNiches = useCallback(async () => {
         try {
@@ -84,6 +85,21 @@ const AddFiles = () => {
         } catch (err: any) {
             setError(err.message || "An error occurred while deleting niche");
         }
+    };
+
+    const handleDeleteClick = (nicheValue: string) => {
+        setShowDeleteConfirm(nicheValue);
+    };
+
+    const confirmDelete = async () => {
+        if (showDeleteConfirm) {
+            await deleteNiche(showDeleteConfirm);
+            setShowDeleteConfirm(null);
+        }
+    };
+
+    const cancelDelete = () => {
+        setShowDeleteConfirm(null);
     };
 
     const syncDocuments = async () => {
@@ -235,7 +251,7 @@ const AddFiles = () => {
                                                         </div>
                                                         <span className="text-[#A9B4C2]">{niche.label}</span>
                                                     </button>
-                                                    <button onClick={() => deleteNiche(niche.value)} className="text-red-400 hover:text-red-500">
+                                                    <button onClick={() => handleDeleteClick(niche.value)} className="text-red-400 hover:text-red-500">
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>
                                                 </div>
@@ -352,6 +368,32 @@ const AddFiles = () => {
                         {error && (
                             <div className="bg-[#4A5A73] border border-red-400 text-red-300 p-3 rounded-lg">
                                 <strong>Error: </strong>{error}
+                            </div>
+                        )}
+
+                        {/* Delete Confirmation Popup */}
+                        {showDeleteConfirm && (
+                            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                <div className="bg-[#2A3548] p-6 rounded-lg border border-[#3C4A61]">
+                                    <h3 className="text-lg font-medium text-[#FFFFFF] mb-4">Are you sure you want to delete this niche?</h3>
+                                    <p className="text-[#A9B4C2] mb-6">
+                                        {availableNiches.find(n => n.value === showDeleteConfirm)?.label}
+                                    </p>
+                                    <div className="flex justify-end gap-4">
+                                        <button
+                                            onClick={cancelDelete}
+                                            className="px-4 py-2 bg-[#4A5A73] text-[#A9B4C2] rounded-lg hover:bg-[#5A6A83]"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={confirmDelete}
+                                            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                        >
+                                            Yes, Delete
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>
