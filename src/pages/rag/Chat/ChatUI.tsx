@@ -43,7 +43,7 @@ const ChatUI = () => {
       {/* Navigation Bar - Fixed at Top (Placeholder) */}
       <div className="fixed top-0 left-0 right-0 h-16 glass z-20 border-b border-white/10">
         <div className="flex items-center justify-between p-4">
-          <span className="font-medium">Navigation</span>
+          <span className="font-medium"></span>
           {/* Replace with your actual Navigation component if needed */}
         </div>
       </div>

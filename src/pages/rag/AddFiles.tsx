@@ -1,4 +1,3 @@
-// AddFiles.tsx
 import { useState, useEffect, useCallback } from "react";
 import { Loader2, Check, Link as LinkIcon, File, DownloadCloud, PlayCircle, Trash2, Plus } from "lucide-react";
 
@@ -22,7 +21,7 @@ const AddFiles = () => {
     const [syncLoading, setSyncLoading] = useState(false);
     const [logs, setLogs] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
-    const [infoMessage, setInfoMessage] = useState<string | null>(null); // New state for informational messages
+    const [infoMessage, setInfoMessage] = useState<string | null>(null);
     const [availableNiches, setAvailableNiches] = useState<NicheOption[]>([]);
     const [results, setResults] = useState<URLProcessingResult[]>([]);
     const [mode, setMode] = useState<'process' | 'extract' | 'youtube'>('process');
@@ -36,11 +35,8 @@ const AddFiles = () => {
         try {
             const response = await fetch("https://ushapangeni.com.np/get-niches");
             const data = await response.json();
-            if (data.success) {
-                setAvailableNiches(data.niches);
-            } else {
-                setError(data.error || "Failed to fetch niches");
-            }
+            if (data.success) setAvailableNiches(data.niches);
+            else setError(data.error || "Failed to fetch niches");
         } catch (err: any) {
             setError(err.message || "An error occurred while fetching niches");
         }
@@ -63,15 +59,10 @@ const AddFiles = () => {
             });
             const data = await response.json();
             if (data.success) {
-                setAvailableNiches(prev => [
-                    ...prev,
-                    { value: data.niche, label: data.display_niche }
-                ]);
+                setAvailableNiches(prev => [...prev, { value: data.niche, label: data.display_niche }]);
                 setNewNicheInput("");
                 setError(null);
-            } else {
-                setError(data.error || "Failed to add niche");
-            }
+            } else setError(data.error || "Failed to add niche");
         } catch (err: any) {
             setError(err.message || "An error occurred while adding niche");
         }
@@ -89,9 +80,7 @@ const AddFiles = () => {
                 setAvailableNiches(prev => prev.filter(n => n.value !== nicheValue));
                 if (selectedNiche === nicheValue) setSelectedNiche("");
                 setError(null);
-            } else {
-                setError(data.error || "Failed to delete niche");
-            }
+            } else setError(data.error || "Failed to delete niche");
         } catch (err: any) {
             setError(err.message || "An error occurred while deleting niche");
         }
@@ -122,16 +111,13 @@ const AddFiles = () => {
             setError("Please select a specific niche");
             return;
         }
-
         setProcessLoading(true);
         setError(null);
-        setInfoMessage(null); // Clear any previous info message
+        setInfoMessage(null);
         setResults([]);
-
         try {
             let endpoint = "";
             let body: any = { niche: selectedNiche };
-
             if (mode === 'process') {
                 endpoint = "https://ushapangeni.com.np/process-urls";
                 body.urls = input.split(/[\n,\s]+/).map(url => url.trim()).filter(url => url.length > 0);
@@ -142,57 +128,36 @@ const AddFiles = () => {
                 endpoint = "https://ushapangeni.com.np/process-youtube";
                 body.url = input;
             }
-
             const response = await fetch(endpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(body),
             });
-
             const data = await response.json();
-
             if (data.success) {
-                if (mode === 'extract') {
-                    setExtractedPdfCount(data.count);
-                }
-                if (data.results) {
-                    setResults(data.results);
-                } else {
-                    setResults([data]);
-                }
-            } else {
-                setError(data.error || `An unknown error occurred during ${mode} processing.`);
-            }
+                if (mode === 'extract') setExtractedPdfCount(data.count);
+                if (data.results) setResults(data.results);
+                else setResults([data]);
+            } else setError(data.error || `An unknown error occurred during ${mode} processing.`);
         } catch (err: any) {
-            if (mode === 'youtube') {
-                setInfoMessage("Seems like you have lots of videos, which may take some time to load in the system!");
-            } else {
-                setError(err.message || `An error occurred during ${mode} processing.`);
-            }
+            if (mode === 'youtube') setInfoMessage("Seems like you have lots of videos, which may take some time to load in the system!");
+            else setError(err.message || `An error occurred during ${mode} processing.`);
         } finally {
             setProcessLoading(false);
         }
     };
 
     const placeholderText = () => {
-        if (mode === 'process') {
-            return "https://example.com/article1\nhttps://example.com/article2\nhttps://example.com/document.pdf";
-        } else if (mode === 'extract') {
-            return "https://example.com";
-        } else if (mode === 'youtube') {
-            return "https://www.youtube.com/watch?v=...";
-        }
+        if (mode === 'process') return "https://example.com/article1\nhttps://example.com/article2";
+        if (mode === 'extract') return "https://example.com";
+        if (mode === 'youtube') return "https://www.youtube.com/watch?v=...";
         return "";
     };
 
     const inputLabel = () => {
-        if (mode === 'process') {
-            return "Paste URLs (No Limit)";
-        } else if (mode === 'extract') {
-            return "Enter URL (One at a time)";
-        } else if (mode === 'youtube') {
-            return "Enter YouTube URLs (No Limit)";
-        }
+        if (mode === 'process') return "Paste URLs (Separate by line or space)";
+        if (mode === 'extract') return "Enter URL to Extract PDFs";
+        if (mode === 'youtube') return "Enter YouTube URL(s)";
         return "";
     };
 
@@ -204,65 +169,73 @@ const AddFiles = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-[#FFF5F5] via-[#B8C5E9] to-[#5B6BA9] py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-                <div className="space-y-8">
+        <div className="min-h-screen bg-[#1A2233] py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-5xl mx-auto">
+                <div className="space-y-6">
+                    {/* Header */}
                     <div className="text-center">
-                        <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#1E2A5A] to-[#5B6BA9] mb-2">
-                            Add Files to RAG System
-                        </h1>
-                        <p className="text-[#1E2A5A]">Process URLs, PDFs, and YouTube Videos</p>
+                        <h1 className="text-3xl font-bold text-[#FFFFFF]">Add Files to RAG System</h1>
+                        <p className="text-[#A9B4C2] mt-1">Process URLs, extract PDFs, or add YouTube content effortlessly</p>
                     </div>
 
-                    <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-lg p-6 space-y-6 border border-[#B8C5E9]/50">
+                    {/* Main Card */}
+                    <div className="bg-[#2A3548] rounded-xl shadow-sm border border-[#3C4A61] p-6 space-y-6">
                         {/* Mode Toggle */}
-                        <div className="flex justify-center space-x-4">
-                            <button onClick={() => setMode('process')} className={`px-6 py-2 rounded-lg transition-colors ${mode === 'process' ? 'bg-[#1E2A5A] text-white' : 'bg-[#F0F4FF] text-[#1E2A5A] hover:bg-[#B8C5E9]'}`}>Process URLs</button>
-                            <button onClick={() => setMode('extract')} className={`px-6 py-2 rounded-lg transition-colors ${mode === 'extract' ? 'bg-[#1E2A5A] text-white' : 'bg-[#F0F4FF] text-[#1E2A5A] hover:bg-[#B8C5E9]'}`}>PDF Extraction</button>
-                            <button onClick={() => setMode('youtube')} className={`px-6 py-2 rounded-lg transition-colors ${mode === 'youtube' ? 'bg-[#1E2A5A] text-white' : 'bg-[#F0F4FF] text-[#1E2A5A] hover:bg-[#B8C5E9]'}`}>YouTube</button>
+                        <div className="flex justify-center gap-2 bg-[#3C4A61] p-1 rounded-lg">
+                            {(['process', 'extract', 'youtube'] as const).map(m => (
+                                <button
+                                    key={m}
+                                    onClick={() => setMode(m)}
+                                    className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all ${mode === m ? 'bg-[#1E2D4D] text-white' : 'text-[#A9B4C2] hover:bg-[#4A5A73]'}`}
+                                >
+                                    {m === 'process' ? 'Process URLs' : m === 'extract' ? 'Extract PDFs' : 'YouTube'}
+                                </button>
+                            ))}
                         </div>
 
-                        <div className="bg-[#F0F4FF] rounded-lg p-6 border border-[#B8C5E9]/50">
-                            <h2 className="text-xl font-semibold text-[#1E2A5A] mb-4">
-                                {mode === 'process' ? 'Supports Article, Pdf, Jpg' : mode === 'extract' ? 'Process all pdfs from a page' : 'YouTube Video/Playlist'}
-                            </h2>
-                            <div className="space-y-4">
-                                {/* Niche Selection */}
+                        {/* Input Section */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Niche Selection */}
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-[#FFFFFF]">Select Niche</label>
                                 <div className="relative">
-                                    <label className="block text-[#1E2A5A] mb-2">Select Niche</label>
-                                    <div className="w-full p-3 border border-[#B8C5E9] rounded-lg bg-white flex items-center justify-between cursor-pointer" onClick={() => setNicheDropdownOpen(!nicheDropdownOpen)}>
-                                        <span>{selectedNiche ? availableNiches.find(n => n.value === selectedNiche)?.label || selectedNiche : "Select a niche"}</span>
-                                        <svg className="w-4 h-4 text-[#1E2A5A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <button
+                                        onClick={() => setNicheDropdownOpen(!nicheDropdownOpen)}
+                                        className="w-full p-3 border border-[#3C4A61] rounded-lg bg-[#3C4A61] text-left text-[#A9B4C2] flex justify-between items-center"
+                                    >
+                                        <span>{selectedNiche ? availableNiches.find(n => n.value === selectedNiche)?.label : "Choose a niche"}</span>
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                         </svg>
-                                    </div>
-
+                                    </button>
                                     {nicheDropdownOpen && (
-                                        <div className="absolute mt-1 w-full bg-white border border-[#B8C5E9] rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
-                                            {/* Add New Niche Input */}
-                                            <div className="p-2 border-b border-[#B8C5E9]">
-                                                <div className="flex items-center space-x-2">
+                                        <div className="absolute w-full mt-1 bg-[#3C4A61] border border-[#4A5A73] rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
+                                            <div className="p-2 border-b border-[#4A5A73]">
+                                                <div className="flex gap-2">
                                                     <input
                                                         type="text"
                                                         value={newNicheInput}
                                                         onChange={(e) => setNewNicheInput(e.target.value)}
-                                                        placeholder="Add new niche"
-                                                        className="w-full p-2 border border-[#B8C5E9] rounded-lg"
+                                                        placeholder="New niche"
+                                                        className="flex-1 p-2 border border-[#4A5A73] rounded-lg text-sm bg-[#2A3548] text-[#A9B4C2]"
                                                     />
-                                                    <button onClick={addNiche} className="p-2 bg-[#1E2A5A] text-white rounded-lg hover:bg-[#5B6BA9]">
+                                                    <button onClick={addNiche} className="p-2 bg-[#3A9BA4] text-white rounded-lg hover:bg-[#308C93]">
                                                         <Plus className="h-4 w-4" />
                                                     </button>
                                                 </div>
                                             </div>
                                             {availableNiches.map(niche => (
-                                                <div key={niche.value} className="flex items-center justify-between px-4 py-2 hover:bg-[#F0F4FF] cursor-pointer">
-                                                    <div className="flex items-center" onClick={() => { setSelectedNiche(niche.value); setNicheDropdownOpen(false); }}>
-                                                        <div className="w-5 h-5 border border-[#B8C5E9] rounded flex items-center justify-center mr-3">
-                                                            {selectedNiche === niche.value && <Check className="w-4 h-4 text-[#5B6BA9]" />}
+                                                <div key={niche.value} className="flex items-center justify-between p-2 hover:bg-[#4A5A73]">
+                                                    <button
+                                                        onClick={() => { setSelectedNiche(niche.value); setNicheDropdownOpen(false); }}
+                                                        className="flex items-center w-full text-left"
+                                                    >
+                                                        <div className="w-5 h-5 border border-[#4A5A73] rounded mr-2 flex items-center justify-center">
+                                                            {selectedNiche === niche.value && <Check className="w-4 h-4 text-[#3A9BA4]" />}
                                                         </div>
-                                                        <span>{niche.label}</span>
-                                                    </div>
-                                                    <button onClick={() => deleteNiche(niche.value)} className="text-red-600 hover:text-red-800">
+                                                        <span className="text-[#A9B4C2]">{niche.label}</span>
+                                                    </button>
+                                                    <button onClick={() => deleteNiche(niche.value)} className="text-red-400 hover:text-red-500">
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>
                                                 </div>
@@ -270,119 +243,115 @@ const AddFiles = () => {
                                         </div>
                                     )}
                                 </div>
+                            </div>
 
-                                {/* Unified Input */}
-                                <div>
-                                    <label className="block text-[#1E2A5A] mb-2">{inputLabel()}</label>
-                                    <textarea
-                                        value={input}
-                                        onChange={(e) => setInput(e.target.value)}
-                                        placeholder={placeholderText()}
-                                        disabled={processLoading}
-                                        className="w-full min-h-[100px] p-4 rounded-lg border border-[#B8C5E9] bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-[#5B6BA9] focus:border-transparent resize-none transition-all duration-200 ease-in-out disabled:opacity-50"
-                                    />
-                                </div>
-
-                                {/* Unified Process Button */}
-                                <div className="flex justify-end">
-                                    <button onClick={processInput} disabled={processLoading} className="inline-flex items-center px-4 py-2 bg-[#1E2A5A] text-white rounded-lg hover:bg-[#5B6BA9] transition-colors disabled:opacity-50">
-                                        {processLoading ? (<Loader2 className="mr-2 h-4 w-4 animate-spin" />) : getIcon()}
-                                        {mode === 'process' ? 'Process URLs' : mode === 'extract' ? 'Extract PDFs' : 'Process YouTube Video'}
-                                    </button>
-                                </div>
-
-                                {/* Unified Results Display */}
-                                {(results.length > 0) && (
-                                    <div className="mt-4">
-                                        <h3 className="font-medium text-[#1E2A5A] mb-2">{mode === 'extract' ? `Extracted PDFs: ${extractedPdfCount}` : "Processing Results:"}</h3>
-                                        <div className="bg-white rounded-lg border border-[#B8C5E9] overflow-hidden">
-                                            <table className="min-w-full divide-y divide-[#B8C5E9]">
-                                                <thead className="bg-[#F0F4FF]">
-                                                    <tr>
-                                                        <th className="px-4 py-2 text-left text-xs font-medium text-[#1E2A5A] uppercase tracking-wider">
-                                                            URL
-                                                        </th>
-                                                        {(mode !== 'youtube') && <th className="px-4 py-2 text-left text-xs font-medium text-[#1E2A5A] uppercase tracking-wider">Type</th>}
-                                                        {(mode !== 'youtube') && <th className="px-4 py-2 text-left text-xs font-medium text-[#1E2A5A] uppercase tracking-wider">
-                                                            Size
-                                                        </th>}
-                                                        {mode === 'youtube' && <th className="px-4 py-2 text-left text-xs font-medium text-[#1E2A5A] uppercase tracking-wider">File</th>}
-                                                        <th className="px-4 py-2 text-left text-xs font-medium text-[#1E2A5A] uppercase tracking-wider">
-                                                            Status
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="bg-white divide-y divide-[#B8C5E9]">
-                                                    {results.map((result, index) => (
-                                                        <tr key={index}>
-                                                            <td className="px-4 py-2 text-sm text-[#1E2A5A] truncate max-w-[200px]">
-                                                                {result.url}
-                                                            </td>
-                                                            {(mode !== 'youtube') && <td className="px-4 py-2 text-sm text-[#1E2A5A]">{result.content_type || "unknown"}</td>}
-                                                            {(mode !== 'youtube') && <td className="px-4 py-2 text-sm text-[#1E2A5A]">
-                                                                {result.characters
-                                                                    ? typeof result.characters === 'number'
-                                                                        ? `${result.characters} chars`
-                                                                        : `${Math.round(parseInt(result.characters as string) / 1024)} KB`
-                                                                    : "unknown"}
-                                                            </td>}
-                                                            {mode === 'youtube' && <td className="px-4 py-2 text-sm text-[#1E2A5A]"><a href={result.file_path} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{result.filename}</a></td>}
-                                                            <td className="px-4 py-2 text-sm">
-                                                                <span
-                                                                    className={`px-2 py-1 rounded-full text-xs ${result.status === 'success'
-                                                                        ? 'bg-green-100 text-green-800'
-                                                                        : 'bg-red-100 text-red-800'
-                                                                        }`}
-                                                                >
-                                                                    {result.status === 'success' ? 'Success' : 'Failed'}
-                                                                </span>
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                )}
+                            {/* Input Area */}
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-[#FFFFFF]">{inputLabel()}</label>
+                                <textarea
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    placeholder={placeholderText()}
+                                    disabled={processLoading}
+                                    className="w-full h-32 p-3 border border-[#3C4A61] rounded-lg bg-[#3C4A61] text-[#A9B4C2] focus:outline-none focus:ring-2 focus:ring-[#3A9BA4] disabled:opacity-50 resize-none"
+                                />
                             </div>
                         </div>
 
-                        {/* Sync Documents Button */}
+                        {/* Process Button */}
+                        <div className="flex justify-end">
+                            <button
+                                onClick={processInput}
+                                disabled={processLoading}
+                                className="inline-flex items-center px-4 py-2 bg-[#3A9BA4] text-white rounded-lg hover:bg-[#308C93] transition-colors disabled:opacity-50"
+                            >
+                                {processLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : getIcon()}
+                                {mode === 'process' ? 'Process URLs' : mode === 'extract' ? 'Extract PDFs' : 'Process YouTube'}
+                            </button>
+                        </div>
+
+                        {/* Results */}
+                        {results.length > 0 && (
+                            <div className="space-y-2">
+                                <h3 className="text-sm font-medium text-[#FFFFFF]">{mode === 'extract' ? `Extracted PDFs: ${extractedPdfCount}` : "Results"}</h3>
+                                <div className="overflow-x-auto border border-[#3C4A61] rounded-lg">
+                                    <table className="min-w-full divide-y divide-[#3C4A61]">
+                                        <thead className="bg-[#4A5A73]">
+                                            <tr>
+                                                <th className="px-4 py-2 text-left text-xs font-medium text-[#A9B4C2] uppercase">URL</th>
+                                                {mode !== 'youtube' && <th className="px-4 py-2 text-left text-xs font-medium text-[#A9B4C2] uppercase">Type</th>}
+                                                {mode !== 'youtube' && <th className="px-4 py-2 text-left text-xs font-medium text-[#A9B4C2] uppercase">Size</th>}
+                                                {mode === 'youtube' && <th className="px-4 py-2 text-left text-xs font-medium text-[#A9B4C2] uppercase">File</th>}
+                                                <th className="px-4 py-2 text-left text-xs font-medium text-[#A9B4C2] uppercase">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-[#2A3548] divide-y divide-[#3C4A61]">
+                                            {results.map((result, index) => (
+                                                <tr key={index}>
+                                                    <td className="px-4 py-2 text-sm text-[#A9B4C2] truncate max-w-xs">{result.url}</td>
+                                                    {mode !== 'youtube' && <td className="px-4 py-2 text-sm text-[#A9B4C2]">{result.content_type || "unknown"}</td>}
+                                                    {mode !== 'youtube' && (
+                                                        <td className="px-4 py-2 text-sm text-[#A9B4C2]">
+                                                            {result.characters
+                                                                ? typeof result.characters === 'number'
+                                                                    ? `${result.characters} chars`
+                                                                    : `${Math.round(parseInt(result.characters as string) / 1024)} KB`
+                                                                : "unknown"}
+                                                        </td>
+                                                    )}
+                                                    {mode === 'youtube' && (
+                                                        <td className="px-4 py-2 text-sm text-[#A9B4C2]">
+                                                            <a href={result.file_path} target="_blank" rel="noopener noreferrer" className="text-[#3A9BA4] hover:underline">
+                                                                {result.filename}
+                                                            </a>
+                                                        </td>
+                                                    )}
+                                                    <td className="px-4 py-2 text-sm">
+                                                        <span className={`px-2 py-1 rounded-full text-xs ${result.status === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                                            {result.status === 'success' ? 'Success' : 'Failed'}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Sync Button */}
                         <div className="flex justify-end">
                             <button
                                 onClick={syncDocuments}
                                 disabled={syncLoading}
-                                className="inline-flex items-center px-4 py-2 bg-[#1E2A5A] text-white rounded-lg hover:bg-[#5B6BA9] transition-colors disabled:opacity-50"
+                                className="inline-flex items-center px-4 py-2 bg-[#1E2D4D] text-white rounded-lg hover:bg-[#2D3E5D] transition-colors disabled:opacity-50"
                             >
                                 {syncLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                                 Sync Documents
                             </button>
                         </div>
 
-                        {/* Document Processing Logs */}
+                        {/* Logs */}
                         {logs.length > 0 && (
-                            <div className="bg-[#F0F4FF] rounded-lg p-4 border border-[#B8C5E9] max-h-60 overflow-y-auto">
-                                <h4 className="font-medium text-[#1E2A5A] mb-2">Document Processing Logs:</h4>
-                                <ul className="space-y-1">
-                                    {logs.map((log, index) => (
-                                        <li key={index} className="text-sm text-[#1E2A5A]">{log}</li>
-                                    ))}
-                                </ul>
+                            <div className="space-y-2">
+                                <h4 className="text-sm font-medium text-[#FFFFFF]">Processing Logs</h4>
+                                <div className="bg-[#4A5A73] p-4 rounded-lg border border-[#3C4A61] max-h-40 overflow-y-auto">
+                                    <ul className="space-y-1 text-sm text-[#A9B4C2]">
+                                        {logs.map((log, index) => <li key={index}>{log}</li>)}
+                                    </ul>
+                                </div>
                             </div>
                         )}
 
-                        {/* Informational Message Display */}
+                        {/* Messages */}
                         {infoMessage && (
-                            <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
-                                <span className="block sm:inline">{infoMessage}</span>
+                            <div className="bg-[#2F445E] border border-[#3A9BA4] text-[#3A9BA4] p-3 rounded-lg">
+                                {infoMessage}
                             </div>
                         )}
-
-                        {/* Error Display */}
                         {error && (
-                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                                <strong className="font-bold">Error! </strong>
-                                <span className="block sm:inline">{error}</span>
+                            <div className="bg-[#4A5A73] border border-red-400 text-red-300 p-3 rounded-lg">
+                                <strong>Error: </strong>{error}
                             </div>
                         )}
                     </div>
