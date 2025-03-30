@@ -99,6 +99,17 @@ const Navigation = () => {
             >
               Browser Use
             </Link>
+
+            <Link
+              to="/sounds"
+              className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
+                isActive("/sounds")
+                  ? "border-[#A5B4FC] text-[#FFFFFF]"
+                  : "border-transparent text-[#A9B4C2] hover:text-[#FFFFFF] hover:border-[#3A9BA4]"
+              }`}
+            >
+              Sounds
+            </Link>
           </div>
         </div>
       </div>
